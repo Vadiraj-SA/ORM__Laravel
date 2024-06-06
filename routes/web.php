@@ -25,6 +25,7 @@ Route::post('/books', [LibraryController::class, 'storeBook'])->name('books.stor
 Route::get('/books/{id}', [LibraryController::class, 'showBook'])->name('books.show');
 Route::put('/books/{id}', [LibraryController::class, 'updateBook'])->name('books.update');
 Route::delete('/books/{id}', [LibraryController::class, 'destroyBook'])->name('books.destroy');
+Route::get('/books/{id}/edit', [LibraryController::class, 'showBook'])->name('books.edit');
 
 // Authors routes
 Route::get('/authors', [LibraryController::class, 'indexAuthors'])->name('authors.index');
@@ -33,6 +34,7 @@ Route::post('/authors', [LibraryController::class, 'storeAuthor'])->name('author
 Route::get('/authors/{id}', [LibraryController::class, 'showAuthor'])->name('authors.show');
 Route::put('/authors/{id}', [LibraryController::class, 'updateAuthor'])->name('authors.update');
 Route::delete('/authors/{id}', [LibraryController::class, 'destroyAuthor'])->name('authors.destroy');
+Route::get('/authors/{id}/edit', [LibraryController::class, 'showAuthor'])->name('authors.edit'); // Add this line
 
 // Borrowers routes
 Route::get('/borrowers', [LibraryController::class, 'indexBorrowers'])->name('borrowers.index');
@@ -41,5 +43,4 @@ Route::post('/borrowers', [LibraryController::class, 'storeBorrower'])->name('bo
 Route::get('/borrowers/{id}', [LibraryController::class, 'showBorrower'])->name('borrowers.show');
 Route::put('/borrowers/{id}', [LibraryController::class, 'updateBorrower'])->name('borrowers.update');
 Route::delete('/borrowers/{id}', [LibraryController::class, 'destroyBorrower'])->name('borrowers.destroy');
-
-Route::get('/books/{id}/edit', [LibraryController::class, 'showBook'])->name('books.edit');
+Route::get('/borrowers/{id}/edit', [LibraryController::class, 'showBorrower'])->name('borrowers.edit'); // Add this line
