@@ -42,7 +42,8 @@ class LibraryController extends Controller
 
     public function showBook($id)
     {
-        $book = Book::find($id);
+        //$book = Book::find($id);
+        $book = Book::with('author')->find($id);
         $authors = Author::all();
         return view('library.book_form', compact('book', 'authors'));
     }
@@ -75,7 +76,8 @@ class LibraryController extends Controller
     // Authors
     public function indexAuthors()
     {
-        $authors = Author::all();
+        //$authors = Author::all();
+        $authors = Author::with('books')->get();
         return view('library.authors', compact('authors'));
     }
 
@@ -151,7 +153,8 @@ class LibraryController extends Controller
 
     public function showBorrower($id)
     {
-        $borrower = Borrower::find($id);
+        //$borrower = Borrower::find($id);
+        $borrower = Borrower::with('profile')->find($id);
         return view('library.borrower_form', compact('borrower'));
     }
 

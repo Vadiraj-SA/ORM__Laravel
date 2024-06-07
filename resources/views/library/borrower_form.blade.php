@@ -14,6 +14,14 @@
                     <label for="name">Name</label>
                     <input type="text" class="form-control" id="name" name="name" value="{{ $borrower->name ?? '' }}">
                 </div>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" class="form-control" id="address" name="address" value="{{ $borrower->profile->address ?? '' }}">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="text" class="form-control" id="phone" name="phone" value="{{ $borrower->profile->phone ?? '' }}">
+                </div>
                 <button type="submit" class="btn btn-primary">{{ isset($borrower) ? 'Update' : 'Add' }} Borrower</button>
             </form>
         </div>

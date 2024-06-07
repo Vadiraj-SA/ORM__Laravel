@@ -10,6 +10,7 @@
                 <thead>
                     <tr>
                         <th>Name</th>
+                        <th>Books</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -17,6 +18,13 @@
                     @foreach ($authors as $author)
                         <tr>
                             <td>{{ $author->name }}</td>
+                            <td>
+                                <ul>
+                                    @foreach ($author->books as $book)
+                                        <li>{{ $book->title }} ({{ $book->published_year }})</li>
+                                    @endforeach
+                                </ul>
+                            </td>
                             <td>
                                 <a href="/authors/{{ $author->id }}/edit" class="btn btn-warning">Edit</a>
                                 <form action="/authors/{{ $author->id }}" method="POST" style="display:inline-block;">

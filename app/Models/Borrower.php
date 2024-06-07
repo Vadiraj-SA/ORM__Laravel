@@ -14,4 +14,9 @@ class Borrower extends Model
     {
         return $this->belongsToMany(Book::class, 'book_borrower')->withPivot('borrowed_at', 'returned_at')->withTimestamps();
     }
+
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
+    }
 }
