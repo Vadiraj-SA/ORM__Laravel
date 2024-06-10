@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Book;
 use App\Models\Author;
 use App\Models\Borrower;
@@ -31,18 +30,12 @@ class LibraryController extends Controller
             'published_year' => 'required|integer',
         ]);
 
-        $book = new Book();
-        $book->title = $request->title;
-        $book->author_id = $request->author_id;
-        $book->published_year = $request->published_year;
-        $book->save();
-
+        Book::create($request->all());
         return redirect('/books');
     }
 
     public function showBook($id)
     {
-        //$book = Book::find($id);
         $book = Book::with('author')->find($id);
         $authors = Author::all();
         return view('library.book_form', compact('book', 'authors'));
@@ -57,26 +50,19 @@ class LibraryController extends Controller
         ]);
 
         $book = Book::find($id);
-        $book->title = $request->title;
-        $book->author_id = $request->author_id;
-        $book->published_year = $request->published_year;
-        $book->save();
-
+        $book->update($request->all());
         return redirect('/books');
     }
 
     public function destroyBook($id)
     {
-        $book = Book::find($id);
-        $book->delete();
-
+        Book::find($id)->delete();
         return redirect('/books');
     }
 
     // Authors
     public function indexAuthors()
     {
-        //$authors = Author::all();
         $authors = Author::with('books')->get();
         return view('library.authors', compact('authors'));
     }
@@ -88,14 +74,8 @@ class LibraryController extends Controller
 
     public function storeAuthor(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-        ]);
-
-        $author = new Author();
-        $author->name = $request->name;
-        $author->save();
-
+        $request->validate(['name' => 'required']);
+        Author::create($request->all());
         return redirect('/authors');
     }
 
@@ -107,76 +87,189 @@ class LibraryController extends Controller
 
     public function updateAuthor(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required',
-        ]);
-
+        $request->validate(['name' => 'required']);
         $author = Author::find($id);
-        $author->name = $request->name;
-        $author->save();
-
+        $author->update($request->all());
         return redirect('/authors');
     }
 
     public function destroyAuthor($id)
     {
-        $author = Author::find($id);
-        $author->delete();
-
+        Author::find($id)->delete();
         return redirect('/authors');
     }
 
     // Borrowers
     public function indexBorrowers()
     {
-        $borrowers = Borrower::all();
+        $borrowers = Borrower::with('books')->get();
         return view('library.borrowers', compact('borrowers'));
     }
 
     public function createBorrower()
-    {
-        return view('library.borrower_form');
-    }
+{
+    $books = Book::where('is_available', true)->get();
+    return view('library.borrower_form', compact('books'));
+}
+
+
+//     public function createBorrower()
+// {
+//     $books = Book::where('is_available', true)->get();
+//     return view('library.borrower_form', compact('books'));
+// }
+
+    // public function createBorrower()
+    // {
+    //     $books = Book::all();
+    //     return view('library.borrower_form', compact('books'));
+    // }
 
     public function storeBorrower(Request $request)
     {
         $request->validate([
             'name' => 'required',
+            'address' => 'required',
+            'phone' => 'required',
+            'book_id' => 'nullable|exists:books,id',
+            'borrowed_date' => 'nullable|date',
+            'returned_date' => 'nullable|date',
         ]);
 
-        $borrower = new Borrower();
-        $borrower->name = $request->name;
-        $borrower->save();
+        $borrower = Borrower::create(['name' => $request->input('name')]);
+
+        $borrower->profile()->create([
+            'address' => $request->input('address'),
+            'phone' => $request->input('phone'),
+        ]);
+
+        if ($request->has('book_id') && $request->input('book_id')) {
+            $book_id = $request->input('book_id');
+            $borrower->books()->attach($book_id, [
+                'borrowed_at' => $request->input('borrowed_date'),
+                'returned_at' => $request->input('returned_date'),
+            ]);
+
+            $book = Book::find($book_id);
+            $book->is_available = !$request->input('borrowed_date');
+            $book->save();
+        }
 
         return redirect('/borrowers');
     }
 
     public function showBorrower($id)
-    {
-        //$borrower = Borrower::find($id);
-        $borrower = Borrower::with('profile')->find($id);
-        return view('library.borrower_form', compact('borrower'));
-    }
+{
+    $borrower = Borrower::with(['profile', 'books'])->find($id);
+    $books = Book::where('is_available', true)->get(); // Fetch only available books
+    return view('library.borrower_form', compact('borrower', 'books'));
+}
+
+//     public function showBorrower($id)
+// {
+//     $borrower = Borrower::with(['profile', 'books'])->find($id);
+//     $books = Book::where('is_available', true)->get(); // Fetch only available books
+//     return view('library.borrower_form', compact('borrower', 'books'));
+// }
+    // public function showBorrower($id)
+    // {
+    //     $borrower = Borrower::with(['profile', 'books'])->find($id);
+    //     $books = Book::all(); // Fetch all books to be displayed in the dropdown
+    //     return view('library.borrower_form', compact('borrower', 'books'));
+    // }
 
     public function updateBorrower(Request $request, $id)
     {
         $request->validate([
             'name' => 'required',
+            'address' => 'required',
+            'phone' => 'required',
+            'book_id' => 'nullable|exists:books,id',
+            'borrowed_date' => 'nullable|date',
+            'returned_date' => 'nullable|date',
         ]);
 
-        $borrower = Borrower::find($id);
-        $borrower->name = $request->name;
-        $borrower->save();
+        $borrower = Borrower::findOrFail($id);
+        $borrower->update(['name' => $request->input('name')]);
+
+        if ($borrower->profile) {
+            $borrower->profile->update([
+                'address' => $request->input('address'),
+                'phone' => $request->input('phone'),
+            ]);
+        } else {
+            $borrower->profile()->create([
+                'address' => $request->input('address'),
+                'phone' => $request->input('phone'),
+            ]);
+        }
+
+        $borrower->books()->detach();
+        if ($request->has('book_id') && $request->input('book_id')) {
+            $book_id = $request->input('book_id');
+            $borrower->books()->attach($book_id, [
+                'borrowed_at' => $request->input('borrowed_date'),
+                'returned_at' => $request->input('returned_date'),
+            ]);
+
+            $book = Book::find($book_id);
+            $book->is_available = !$request->input('borrowed_date');
+            $book->save();
+        }
 
         return redirect('/borrowers');
     }
 
     public function destroyBorrower($id)
     {
-        $borrower = Borrower::find($id);
-        $borrower->delete();
-
+        Borrower::findOrFail($id)->delete();
         return redirect('/borrowers');
     }
-    
+
+    // Borrow Books
+    public function createBorrow()
+    {
+        $borrowers = Borrower::all();
+        $books = Book::where('is_available', true)->get();
+        return view('library.borrow_form', compact('borrowers', 'books'));
+    }
+
+    public function storeBorrow(Request $request)
+    {
+        $request->validate([
+            'borrower_id' => 'required|exists:borrowers,id',
+            'book_id' => 'required|exists:books,id'
+        ]);
+
+        $book = Book::find($request->book_id);
+        if ($book->is_available) {
+            $borrower = Borrower::find($request->borrower_id);
+            $borrower->books()->attach($book, ['borrowed_at' => now()]);
+
+            // Update the book availability
+            $book->update(['is_available' => false]);
+
+            return redirect('/borrowers')->with('success', 'Book borrowed successfully!');
+        } else {
+            return redirect()->back()->with('error', 'Book is not available.');
+        }
+    }
+
+    // Return Books
+    public function returnBook(Request $request, $id)
+    {
+        $request->validate([
+            'borrower_id' => 'required|exists:borrowers,id',
+            'book_id' => 'required|exists:books,id'
+        ]);
+
+        $borrower = Borrower::find($request->borrower_id);
+        $borrower->books()->updateExistingPivot($request->book_id, ['returned_at' => now()]);
+
+        // Update the book availability
+        $book = Book::find($request->book_id);
+        $book->update(['is_available' => true]);
+
+        return redirect('/borrowers')->with('success', 'Book returned successfully!');
+    }
 }

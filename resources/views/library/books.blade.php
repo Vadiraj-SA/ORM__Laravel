@@ -1,4 +1,5 @@
 <!-- resources/views/library/books.blade.php -->
+<!-- resources/views/library/books.blade.php -->
 @extends('layouts.app')
 
 @section('content')
@@ -12,6 +13,7 @@
                         <th>Title</th>
                         <th>Author</th>
                         <th>Published Year</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -21,6 +23,13 @@
                             <td>{{ $book->title }}</td>
                             <td>{{ $book->author->name }}</td>
                             <td>{{ $book->published_year }}</td>
+                            <td>
+                                @if ($book->borrowed)
+                                    <span class="badge badge-danger">Unavailable</span>
+                                @else
+                                    <span class="badge badge-success">Available</span>
+                                @endif
+                            </td>
                             <td>
                                 <a href="/books/{{ $book->id }}/edit" class="btn btn-warning">Edit</a>
                                 <form action="/books/{{ $book->id }}" method="POST" style="display:inline-block;">

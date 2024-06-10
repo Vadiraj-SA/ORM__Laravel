@@ -9,12 +9,8 @@ class Book extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'title', 'author_id', 'published_year', 'available', 'borrowed_at', 'returned_at'
-    ];
-    
-    protected $dates = ['borrowed_at', 'returned_at'];
-    
+    protected $fillable = ['title', 'author_id', 'published_year', 'is_available'];
+
     public function author()
     {
         return $this->belongsTo(Author::class);
@@ -22,7 +18,9 @@ class Book extends Model
 
     public function borrowers()
     {
-        return $this->belongsToMany(Borrower::class, 'book_borrower')->withPivot('borrowed_at', 'returned_at')->withTimestamps();
+        return $this->belongsToMany(Borrower::class, 'borrower_book')
+                    ->withPivot('borrowed_at', 'returned_at')
+                    ->withTimestamps();
     }
-    
 }
+

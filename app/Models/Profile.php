@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Profile extends Model
 {
     use HasFactory;
+
     protected $fillable = ['borrower_id', 'address', 'phone'];
 
     public function borrower()

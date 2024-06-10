@@ -3,17 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LibraryController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
 Route::get('/', function () {
     return view('welcome');
 });
@@ -34,7 +23,7 @@ Route::post('/authors', [LibraryController::class, 'storeAuthor'])->name('author
 Route::get('/authors/{id}', [LibraryController::class, 'showAuthor'])->name('authors.show');
 Route::put('/authors/{id}', [LibraryController::class, 'updateAuthor'])->name('authors.update');
 Route::delete('/authors/{id}', [LibraryController::class, 'destroyAuthor'])->name('authors.destroy');
-Route::get('/authors/{id}/edit', [LibraryController::class, 'showAuthor'])->name('authors.edit'); // Add this line
+Route::get('/authors/{id}/edit', [LibraryController::class, 'showAuthor'])->name('authors.edit');
 
 // Borrowers routes
 Route::get('/borrowers', [LibraryController::class, 'indexBorrowers'])->name('borrowers.index');
@@ -43,4 +32,4 @@ Route::post('/borrowers', [LibraryController::class, 'storeBorrower'])->name('bo
 Route::get('/borrowers/{id}', [LibraryController::class, 'showBorrower'])->name('borrowers.show');
 Route::put('/borrowers/{id}', [LibraryController::class, 'updateBorrower'])->name('borrowers.update');
 Route::delete('/borrowers/{id}', [LibraryController::class, 'destroyBorrower'])->name('borrowers.destroy');
-Route::get('/borrowers/{id}/edit', [LibraryController::class, 'showBorrower'])->name('borrowers.edit'); // Add this line
+Route::get('/borrowers/{id}/edit', [LibraryController::class, 'showBorrower'])->name('borrowers.edit'); // This is the line you should add
